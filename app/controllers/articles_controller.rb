@@ -11,20 +11,23 @@ class ArticlesController < ApplicationController
   
   def edit
     # puts "\n\n\n #{@article.id} \n\n\n"
+    @categories = Category.all
   end
   
   def update
-    @article.update(title: params[:article][:title], content: params[:article][:content])
+    @article.update(article_params)
+    @article.save_categories
     redirect_to @article
   end
   
   def new
     @article = Article.new
+    @categories = Category.all
   end
     
   def create
-    @article = current_user.articles.create(title: params[:article][:title], 
-                                            content: params[:article][:content])
+    @article = current_user.articles.create(article_params)
+    @article.save_categories
     redirect_to @article
     # render json: @article
   end
@@ -40,5 +43,9 @@ class ArticlesController < ApplicationController
   
   def find_article
     @article = Article.find(params[:id])
+  end
+  
+  def article_params
+    params.require(:article).permit(:title, :content, category_elements: [])
   end
 end
